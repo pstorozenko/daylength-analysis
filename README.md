@@ -43,6 +43,7 @@ uv run daylength --name Tromso --lat 69.6492 --lon 18.9553 --tz Europe/Oslo
 
 ```python
 from daylength import WARSAW, sun_events
+
 sun_events(WARSAW, "2024-06-21")  # local, DST-aware sunrise/sunset, day length, azimuths
 ```
 
