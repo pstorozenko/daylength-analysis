@@ -1,6 +1,7 @@
 name: Publish to GitHub Pages
 
-# Re-executes analysis.ipynb and publishes it (code cells hidden) as a single HTML page.
+# Re-executes analysis.ipynb and publishes it (code cells hidden) as a single HTML page
+# by force-pushing the rendered site to the `gh-pages` branch (Pages source: gh-pages / root).
 on:
   push:
     branches: [main]
@@ -14,9 +15,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  publish:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      contents: write # push to gh-pages
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -26,23 +29,16 @@ jobs:
           enable-cache: true
       - run: uv sync --locked
       - name: Render notebook to HTML
-        run: uv run jupyter nbconvert --to html --execute --no-input analysis.ipynb --output-dir _site --output index
-      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
-      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
-        with:
-          path: _site
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    # Only this job gets the write permissions needed to publish.
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        run: |
+          uv run jupyter nbconvert --to html --execute --no-input analysis.ipynb --output-dir _site --output index
+          touch _site/.nojekyll
+      - name: Push to gh-pages
+        working-directory: _site
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git init -q -b gh-pages
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -q -m "Publish ${GITHUB_SHA::7}"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
