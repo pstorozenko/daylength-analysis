@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Jupyter / tooling
+.ipynb_checkpoints/
+.pytest_cache/
+.ruff_cache/
+*.csv
+_site/
