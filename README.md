@@ -3,7 +3,8 @@
 Day length, sunrise/sunset times and sunrise/sunset directions for Warsaw, Poland
 (any other location works too).
 
-Check out the [Jupyter notebook](analysis.ipynb) for visualizations and details.
+See the rendered report at **https://pstorozenko.github.io/daylength-analysis/** or the
+[Jupyter notebook](analysis.ipynb) for code and details.
 
 ## Highlights (March 2024 – March 2025)
 
@@ -31,6 +32,9 @@ uv sync                       # create .venv from uv.lock
 uv run pytest                 # run tests
 uv run ruff check . && uv run ruff format --check .
 uv run jupyter nbconvert --to notebook --execute --inplace analysis.ipynb   # re-run the notebook
+
+# Build the GitHub Pages report locally (open _site/index.html)
+uv run jupyter nbconvert --to html --execute --no-input analysis.ipynb --output-dir _site --output index
 
 # CLI: summary for any location / period, optional CSV export
 uv run daylength --start 2025-01-01 --end 2025-12-31 --csv warsaw-2025.csv
