@@ -1,14 +1,47 @@
 [project]
 name = "warsaw-day-length"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "Sunrise, sunset, day length and sun azimuth analysis (Warsaw by default, any location supported)"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "ephem>=4.1.6",
-    "ipykernel>=6.29.5",
-    "ipywidgets>=8.1.5",
     "matplotlib>=3.9.2",
     "numpy>=2.1.3",
     "pandas>=2.2.3",
+    # zoneinfo needs an IANA database; Windows has none built in.
+    "tzdata>=2024.2",
 ]
+
+[project.scripts]
+daylength = "daylength.cli:main"
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+    "nbconvert>=7.16",
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling>=1.26"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/daylength"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+filterwarnings = ["error"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+extend-include = ["*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "NPY", "PD", "RUF", "SIM"]
+# Unicode minus signs and arrows in plot labels are intentional.
+ignore = ["RUF001", "RUF003"]
